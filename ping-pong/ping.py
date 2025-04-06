@@ -42,7 +42,7 @@ ball.dy = 0.2
 # Placar
 score_display = turtle.Turtle()
 score_display.speed(0)
-score_display.color("white")
+score_display.color("red")
 score_display.penup()
 score_display.hideturtle()
 score_display.goto(0, 260)
