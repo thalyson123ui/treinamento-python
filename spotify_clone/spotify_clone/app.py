@@ -16,10 +16,9 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/')
-def index():
-    songs = os.listdir(app.config['UPLOAD_FOLDER'])
-    return render_template('index.html', songs=songs)
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory('static/uploads', filename)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
