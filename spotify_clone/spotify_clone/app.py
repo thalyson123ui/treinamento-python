@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
+from flask import Flask, render_template, request, redirect, url_for, flash
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -16,9 +16,10 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory('static/uploads', filename)
+@app.route('/')
+def index():
+    songs = os.listdir(app.config['UPLOAD_FOLDER'])
+    return render_template('index.html', songs=songs)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -41,10 +42,6 @@ def upload_file():
 @app.route('/play/<filename>')
 def play_song(filename):
     return render_template('player.html', filename=filename)
-
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(debug=True)
