@@ -1,103 +1,94 @@
 import pygame
-import sys
+import random
 
-# Inicialização do pygame
+# Inicializa o Pygame
 pygame.init()
 
-# Configurações principais
-LARGURA, ALTURA = 800, 600
-TELA = pygame.display.set_mode((LARGURA, ALTURA))
-pygame.display.set_caption("Pac-Man")
+# Constantes
+LARGURA, ALTURA = 600, 600
+TAMANHO_BLOCO = 30
+FPS = 10
 
 # Cores
 PRETO = (0, 0, 0)
-AMARELO = (255, 255, 0)
-BRANCO = (255, 255, 255)
-VERMELHO = (255, 0, 0)
 AZUL = (0, 0, 255)
+AMARELO = (255, 255, 0)
+VERMELHO = (255, 0, 0)
 
-# Configurações do Pac-Man
-pacman_pos = [LARGURA // 2, ALTURA // 2]
-pacman_vel = 5
-pacman_raio = 20
+# Cria tela
+tela = pygame.display.set_mode((LARGURA, ALTURA))
+pygame.display.set_caption("Pac-Man")
 
-# Configurações dos fantasmas
-fantasmas = [
-    {"pos": [100, 100], "vel": [2, 2], "raio": 20},
-    {"pos": [700, 500], "vel": [-2, -2], "raio": 20},
+# Labirinto simples (1 = parede, 0 = espaço livre)
+labirinto = [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1],
+    [1,0,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1],
+    [1,0,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,0,1],
+    [1,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ]
 
-# Configurações das paredes
-paredes = [
-    pygame.Rect(200, 150, 400, 20),
-    pygame.Rect(200, 450, 400, 20),
-    pygame.Rect(350, 250, 20, 200),
-]
+linhas = len(labirinto)
+colunas = len(labirinto[0])
+
+# Pac-Man e Fantasma
+pacman_pos = [1, 1]
+fantasma_pos = [5, 18]
+
+# Funções de utilidade
+def desenhar_labirinto():
+    for y in range(linhas):
+        for x in range(colunas):
+            if labirinto[y][x] == 1:
+                pygame.draw.rect(tela, AZUL, (x*TAMANHO_BLOCO, y*TAMANHO_BLOCO, TAMANHO_BLOCO, TAMANHO_BLOCO))
+
+def mover_fantasma():
+    direcoes = [(0,1),(1,0),(0,-1),(-1,0)]
+    random.shuffle(direcoes)
+    for dx, dy in direcoes:
+        novo_x = fantasma_pos[1] + dx
+        novo_y = fantasma_pos[0] + dy
+        if 0 <= novo_y < linhas and 0 <= novo_x < colunas and labirinto[novo_y][novo_x] == 0:
+            fantasma_pos[0], fantasma_pos[1] = novo_y, novo_x
+            break
 
 # Loop principal
-clock = pygame.time.Clock()
+relogio = pygame.time.Clock()
+rodando = True
 
-def desenhar_pacman(tela, pos, raio):
-    pygame.draw.circle(tela, AMARELO, pos, raio)
+while rodando:
+    for evento in pygame.event.get():
+        if evento.type == pygame.QUIT:
+            rodando = False
 
-def desenhar_fantasmas(tela, fantasmas):
-    for fantasma in fantasmas:
-        pygame.draw.circle(tela, VERMELHO, fantasma["pos"], fantasma["raio"])
+    # Movimentos do Pac-Man
+    teclas = pygame.key.get_pressed()
+    dx, dy = 0, 0
+    if teclas[pygame.K_LEFT]: dx = -1
+    if teclas[pygame.K_RIGHT]: dx = 1
+    if teclas[pygame.K_UP]: dy = -1
+    if teclas[pygame.K_DOWN]: dy = 1
 
-def desenhar_paredes(tela, paredes):
-    for parede in paredes:
-        pygame.draw.rect(tela, AZUL, parede)
+    novo_x = pacman_pos[1] + dx
+    novo_y = pacman_pos[0] + dy
+    if 0 <= novo_y < linhas and 0 <= novo_x < colunas and labirinto[novo_y][novo_x] == 0:
+        pacman_pos = [novo_y, novo_x]
 
-def atualizar_fantasmas(fantasmas):
-    for fantasma in fantasmas:
-        fantasma["pos"][0] += fantasma["vel"][0]
-        fantasma["pos"][1] += fantasma["vel"][1]
+    mover_fantasma()
 
-        # Colisão com as bordas
-        if fantasma["pos"][0] - fantasma["raio"] <= 0 or fantasma["pos"][0] + fantasma["raio"] >= LARGURA:
-            fantasma["vel"][0] *= -1
-        if fantasma["pos"][1] - fantasma["raio"] <= 0 or fantasma["pos"][1"] + fantasma["raio"] >= ALTURA:
-            fantasma["vel"][1] *= -1
+    # Checa colisão
+    if pacman_pos == fantasma_pos:
+        print("Você perdeu!")
+        rodando = False
 
-def colisao_paredes(pacman_pos, paredes):
-    for parede in paredes:
-        if parede.collidepoint(pacman_pos[0], pacman_pos[1]):
-            return True
-    return False
+    tela.fill(PRETO)
+    desenhar_labirinto()
+    pygame.draw.circle(tela, AMARELO, (pacman_pos[1]*TAMANHO_BLOCO+TAMANHO_BLOCO//2, pacman_pos[0]*TAMANHO_BLOCO+TAMANHO_BLOCO//2), TAMANHO_BLOCO//2)
+    pygame.draw.circle(tela, VERMELHO, (fantasma_pos[1]*TAMANHO_BLOCO+TAMANHO_BLOCO//2, fantasma_pos[0]*TAMANHO_BLOCO+TAMANHO_BLOCO//2), TAMANHO_BLOCO//2)
+    
+    pygame.display.flip()
+    relogio.tick(FPS)
 
-def main():
-    while True:
-        for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-        # Movimentação do Pac-Man
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP]:
-            pacman_pos[1] -= pacman_vel
-        if keys[pygame.K_DOWN]:
-            pacman_pos[1] += pacman_vel
-        if keys[pygame.K_LEFT]:
-            pacman_pos[0] -= pacman_vel
-        if keys[pygame.K_RIGHT]:
-            pacman_pos[0] += pacman_vel
-
-        # Verificar colisão com paredes
-        if colisao_paredes(pacman_pos, paredes):
-            pacman_pos = [LARGURA // 2, ALTURA // 2]  # Resetar posição
-
-        # Atualizar fantasmas
-        atualizar_fantasmas(fantasmas)
-
-        # Atualização da tela
-        TELA.fill(PRETO)
-        desenhar_pacman(TELA, pacman_pos, pacman_raio)
-        desenhar_fantasmas(TELA, fantasmas)
-        desenhar_paredes(TELA, paredes)
-
-        pygame.display.flip()
-        clock.tick(60)
-
-if __name__ == "__main__":
-    main()
+pygame.quit()
