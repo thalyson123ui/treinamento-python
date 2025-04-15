@@ -14,10 +14,16 @@ PRETO = (0, 0, 0)
 AZUL = (0, 0, 255)
 AMARELO = (255, 255, 0)
 VERMELHO = (255, 0, 0)
+VERDE = (0, 255, 0)
+ROXO = (160, 32, 240)
+CIANO = (0, 255, 255)
 
 # Cria tela
 tela = pygame.display.set_mode((LARGURA, ALTURA))
 pygame.display.set_caption("Pac-Man")
+
+# Fonte para pontuação
+fonte = pygame.font.SysFont(None, 36)
 
 # Labirinto simples (1 = parede, 0 = espaço livre)
 labirinto = [
@@ -33,9 +39,23 @@ labirinto = [
 linhas = len(labirinto)
 colunas = len(labirinto[0])
 
-# Pac-Man e Fantasma
+# Pac-Man e Fantasmas
 pacman_pos = [1, 1]
-fantasma_pos = [5, 18]
+fantasmas = [
+    {'pos': [5, 18], 'cor': VERMELHO},
+    {'pos': [1, 18], 'cor': VERDE},
+    {'pos': [5, 1], 'cor': ROXO},
+    {'pos': [3, 10], 'cor': CIANO},
+]
+
+# Pontos do jogo
+pontos = set()
+for y in range(linhas):
+    for x in range(colunas):
+        if labirinto[y][x] == 0:
+            pontos.add((y, x))
+
+pontuacao = 0
 
 # Funções de utilidade
 def desenhar_labirinto():
@@ -44,15 +64,20 @@ def desenhar_labirinto():
             if labirinto[y][x] == 1:
                 pygame.draw.rect(tela, AZUL, (x*TAMANHO_BLOCO, y*TAMANHO_BLOCO, TAMANHO_BLOCO, TAMANHO_BLOCO))
 
-def mover_fantasma():
-    direcoes = [(0,1),(1,0),(0,-1),(-1,0)]
-    random.shuffle(direcoes)
-    for dx, dy in direcoes:
-        novo_x = fantasma_pos[1] + dx
-        novo_y = fantasma_pos[0] + dy
-        if 0 <= novo_y < linhas and 0 <= novo_x < colunas and labirinto[novo_y][novo_x] == 0:
-            fantasma_pos[0], fantasma_pos[1] = novo_y, novo_x
-            break
+def mover_fantasmas():
+    for fantasma in fantasmas:
+        direcoes = [(0,1),(1,0),(0,-1),(-1,0)]
+        random.shuffle(direcoes)
+        for dx, dy in direcoes:
+            novo_x = fantasma['pos'][1] + dx
+            novo_y = fantasma['pos'][0] + dy
+            if 0 <= novo_y < linhas and 0 <= novo_x < colunas and labirinto[novo_y][novo_x] == 0:
+                fantasma['pos'] = [novo_y, novo_x]
+                break
+
+def desenhar_pontuacao():
+    texto = fonte.render(f"Pontuação: {pontuacao}", True, (255, 255, 255))
+    tela.blit(texto, (10, 10))
 
 # Loop principal
 relogio = pygame.time.Clock()
@@ -76,18 +101,35 @@ while rodando:
     if 0 <= novo_y < linhas and 0 <= novo_x < colunas and labirinto[novo_y][novo_x] == 0:
         pacman_pos = [novo_y, novo_x]
 
-    mover_fantasma()
+    # Comer pontos
+    if tuple(pacman_pos) in pontos:
+        pontos.remove(tuple(pacman_pos))
+        pontuacao += 10
 
-    # Checa colisão
-    if pacman_pos == fantasma_pos:
-        print("Você perdeu!")
-        rodando = False
+    mover_fantasmas()
+
+    # Checa colisão com qualquer fantasma
+    for fantasma in fantasmas:
+        if pacman_pos == fantasma['pos']:
+            print("Você perdeu!")
+            rodando = False
 
     tela.fill(PRETO)
     desenhar_labirinto()
-    pygame.draw.circle(tela, AMARELO, (pacman_pos[1]*TAMANHO_BLOCO+TAMANHO_BLOCO//2, pacman_pos[0]*TAMANHO_BLOCO+TAMANHO_BLOCO//2), TAMANHO_BLOCO//2)
-    pygame.draw.circle(tela, VERMELHO, (fantasma_pos[1]*TAMANHO_BLOCO+TAMANHO_BLOCO//2, fantasma_pos[0]*TAMANHO_BLOCO+TAMANHO_BLOCO//2), TAMANHO_BLOCO//2)
-    
+
+    # Pontos
+    for y, x in pontos:
+        pygame.draw.circle(tela, (255, 255, 255), (x*TAMANHO_BLOCO+TAMANHO_BLOCO//2, y*TAMANHO_BLOCO+TAMANHO_BLOCO//2), 5)
+
+    # Animação básica do Pac-Man (círculo piscando)
+    tamanho_boca = (pygame.time.get_ticks() // 150) % TAMANHO_BLOCO // 4
+    pygame.draw.circle(tela, AMARELO, (pacman_pos[1]*TAMANHO_BLOCO+TAMANHO_BLOCO//2, pacman_pos[0]*TAMANHO_BLOCO+TAMANHO_BLOCO//2), TAMANHO_BLOCO//2 - tamanho_boca)
+
+    # Desenha fantasmas
+    for fantasma in fantasmas:
+        pygame.draw.circle(tela, fantasma['cor'], (fantasma['pos'][1]*TAMANHO_BLOCO+TAMANHO_BLOCO//2, fantasma['pos'][0]*TAMANHO_BLOCO+TAMANHO_BLOCO//2), TAMANHO_BLOCO//2)
+
+    desenhar_pontuacao()
     pygame.display.flip()
     relogio.tick(FPS)
 
