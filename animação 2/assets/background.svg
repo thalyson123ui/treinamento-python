@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#000000" />
+  <!-- Stars -->
+  <circle cx="100" cy="100" r="1" fill="#FFFFFF" />
+  <circle cx="200" cy="150" r="1" fill="#FFFFFF" />
+  <circle cx="300" cy="200" r="1" fill="#FFFFFF" />
+  <circle cx="400" cy="100" r="1" fill="#FFFFFF" />
+  <circle cx="500" cy="300" r="1" fill="#FFFFFF" />
+  <circle cx="600" cy="400" r="1" fill="#FFFFFF" />
+  <circle cx="700" cy="500" r="1" fill="#FFFFFF" />
+  <circle cx="750" cy="50" r="1" fill="#FFFFFF" />
+  <circle cx="150" cy="350" r="1" fill="#FFFFFF" />
+  <circle cx="250" cy="450" r="1" fill="#FFFFFF" />
+  <circle cx="350" cy="550" r="1" fill="#FFFFFF" />
+  <circle cx="450" cy="250" r="1" fill="#FFFFFF" />
+  <circle cx="550" cy="150" r="1" fill="#FFFFFF" />
+  <circle cx="650" cy="350" r="1" fill="#FFFFFF" />
+</svg>
