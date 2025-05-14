@@ -2,7 +2,9 @@ import pygame
 import sys
 import random
 
-# Inicialização\pygame.init()
+# Inicialização
+pygame.init()
+pygame.font.init()
 
 # Configurações
 WIDTH, HEIGHT = 800, 400
