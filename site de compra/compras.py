@@ -7,9 +7,9 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-secret")  # troque em produç
 
 # Catálogo simples (em produção, use banco de dados)
 PRODUTOS = {
-    1: {"id": 1, "nome": "Camiseta Minimal", "preco": Decimal("79.90"), "descricao": "Algodão, corte unissex.", "imagem": "https://picsum.photos/seed/camiseta/600/400"},
-    2: {"id": 2, "nome": "Tênis Urban", "preco": Decimal("249.00"), "descricao": "Conforto diário.", "imagem": "https://picsum.photos/seed/tenis/600/400"},
-    3: {"id": 3, "nome": "Mochila Tech", "preco": Decimal("189.50"), "descricao": "Compartimentos e resistência.", "imagem": "https://picsum.photos/seed/mochila/600/400"},
+    1: {"id": 1, "nome": "Camiseta Minimal", "preco": Decimal("79.90"), "descricao": "Algodão, corte unissex.", "imagem": "https://images.pexels.com/photos/991509/pexels-photo-991509.jpeg"},
+    2: {"id": 2, "nome": "Tênis Urban", "preco": Decimal("249.00"), "descricao": "Conforto diário.", "imagem": "https://images.pexels.com/photos/34945394/pexels-photo-34945394.jpeg"},
+    3: {"id": 3, "nome": "Mochila Tech", "preco": Decimal("189.50"), "descricao": "Compartimentos e resistência.", "imagem": "https://images.pexels.com/photos/3731256/pexels-photo-3731256.jpeg"},
 }
 
 def get_carrinho():
