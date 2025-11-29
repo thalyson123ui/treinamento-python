@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Catálogo</h1>
+<div class="grid">
+  {% for p in produtos %}
+  <div class="card">
+    <img src="{{ p.imagem }}" alt="{{ p.nome }}">
+    <h3>{{ p.nome }}</h3>
+    <p class="price">R$ {{ "%.2f"|format(p.preco) }}</p>
+    <p class="desc">{{ p.descricao }}</p>
+    <a class="btn" href="{{ url_for('produto', produto_id=p.id) }}">Ver detalhes</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

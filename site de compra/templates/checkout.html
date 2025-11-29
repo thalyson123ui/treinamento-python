@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Checkout</h1>
+
+{% if carrinho %}
+  <h3>Resumo</h3>
+  <ul class="summary">
+    {% for key, item in carrinho.items() %}
+      <li>{{ item.qty }}x {{ item.nome }} — R$ {{ "%.2f"|format(item.preco|float) }}</li>
+    {% endfor %}
+  </ul>
+  <p><strong>Total:</strong> R$ {{ "%.2f"|format(total) }}</p>
+
+  <form action="{{ url_for('checkout') }}" method="post" class="checkout-form">
+    <label>Nome completo</label>
+    <input type="text" name="nome" required>
+
+    <label>Email</label>
+    <input type="email" name="email" required>
+
+    <label>Endereço</label>
+    <textarea name="endereco" required></textarea>
+
+    <button class="btn btn-primary" type="submit">Confirmar pedido</button>
+  </form>
+{% else %}
+  <p>Seu carrinho está vazio.</p>
+  <a class="btn" href="{{ url_for('index') }}">Voltar às compras</a>
+{% endif %}
+{% endblock %}
